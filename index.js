@@ -13,9 +13,11 @@ exports.sign = sign;
  * @param {string} options.key Key path
  * @param {string} options.cert Cert path
  * @param {string} [options.password] Key password
+ * @param {string} [options.outform] Output format for the PKCS#7 structure (SMIME|PEM|DER)
+ * @param {string} [options.nodetach] Use opaque signing or not
  * @param {function} [cb] Optional callback
  * @returns {object} result Result
- * @returns {string} result.der Der signature
+ * @returns {string} result.output Signed content
  * @returns {ChildProcess} result.child Child process
  */
 
@@ -23,31 +25,36 @@ function sign(options, cb) {
   return new Promise(function (resolve, reject) {
     options = options || {};
 
-    if (!options.content)
+    if (!options.content) {
       throw new Error('Invalid content.');
-
-    if (!options.key)
+    } else if (!options.key){
       throw new Error('Invalid key.');
-
-    if (!options.cert)
+    } else if (!options.cert) {
       throw new Error('Invalid certificate.');
+    }
 
+    // openssl smime -sign -signer facturero.crt -inkey facturero.pem -outform PEM -nodetach
     var command = util.format(
-      'openssl smime -sign -text -signer %s -inkey %s -outform DER -binary',
+      'openssl smime -sign -signer %s -inkey %s -outform %s',
       options.cert,
-      options.key
+      options.key,
+      options.outform || 'PEM'
     );
 
-    if (options.password)
+    if (options.password) {
       command += util.format(' -passin pass:%s', options.password);
+    }
+    if (options.nodetach) {
+      command += ' -nodetach';
+    }
 
     var args = command.split(' ');
     var child = spawn(args[0], args.splice(1));
 
-    var der = [];
+    var output = [];
 
     child.stdout.on('data', function (chunk) {
-      der.push(chunk);
+      output.push(chunk);
     });
 
     child.on('close', function (code) {
@@ -56,7 +63,7 @@ function sign(options, cb) {
       else
         resolve({
           child: child,
-          der: Buffer.concat(der)
+          output: Buffer.concat(output)
         });
     });
 

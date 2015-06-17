@@ -39,10 +39,11 @@ describe('Smime', function () {
       return smime.sign({
         content: fs.createReadStream(path.join(__dirname, 'file-to-sign')),
         key: path.join(__dirname, 'key.pem'),
-        cert: path.join(__dirname, 'certificate.pem')
+        cert: path.join(__dirname, 'certificate.pem'),
+        nodetach: true
       })
       .then(function (res) {
-        expect(res).to.have.property('der');
+        expect(res).to.have.property('output');
         expect(res).to.have.property('child');
       });
     });
@@ -55,7 +56,7 @@ describe('Smime', function () {
         password: 'x'
       })
       .then(function (res) {
-        expect(res).to.have.property('der');
+        expect(res).to.have.property('output');
         expect(res).to.have.property('child');
       });
     });
