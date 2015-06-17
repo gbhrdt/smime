@@ -1,6 +1,7 @@
 var util = require('util');
+var stream = require('stream');
 var spawn = require('child_process').spawn;
-var Promise = require('promise');
+var Promise = require('bluebird');
 
 // Expose methods.
 exports.sign = sign;
@@ -33,7 +34,17 @@ function sign(options, cb) {
       throw new Error('Invalid certificate.');
     }
 
-    // openssl smime -sign -signer facturero.crt -inkey facturero.pem -outform PEM -nodetach
+    if (typeof options.content === 'string') {
+      // http://stackoverflow.com/questions/12755997/how-to-create-streams-from-string-in-node-js
+      var s = new stream.Readable();
+      s._read = function noop() {};
+      s.push(options.content);
+      s.push(null);
+      options.content = s;
+      // s.pipe(process.stdout);
+    }
+
+    // openssl smime -sign -signer file.crt -inkey file.pem
     var command = util.format(
       'openssl smime -sign -signer %s -inkey %s -outform %s',
       options.cert,
@@ -47,6 +58,7 @@ function sign(options, cb) {
     if (options.nodetach) {
       command += ' -nodetach';
     }
+    // console.log(command);
 
     var args = command.split(' ');
     var child = spawn(args[0], args.splice(1));

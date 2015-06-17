@@ -26,6 +26,6 @@
     "mocha": "^2.1.0"
   },
   "dependencies": {
-    "promise": "^7.0.3"
+    "bluebird": "^2.9.27"
   }
 }
