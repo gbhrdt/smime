@@ -3,7 +3,8 @@
 [![Dependency Status](https://david-dm.org/hipush/smime.svg?theme=shields.io)](https://david-dm.org/hipush/smime)
 [![devDependency Status](https://david-dm.org/hipush/smime/dev-status.svg?theme=shields.io)](https://david-dm.org/hipush/smime#info=devDependencies)
 
-Node / io.js wrapper for OpenSSL S/MIME command.
+Node / io.js wrapper for [OpenSSL S/MIME command](https://www.openssl.org/docs/apps/smime.html#COMMAND-OPTIONS).
+
 
 ## Install
 
