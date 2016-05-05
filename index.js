@@ -60,7 +60,14 @@ function sign(options, cb) {
     }
     // console.log(command);
 
+    if (options.intermediateCert)
+      command += util.format(' -certfile %s', options.intermediateCert);
+
     var args = command.split(' ');
+
+    if (options.additionalFlags)
+      args = args.concat(options.additionalFlags);
+    
     var child = spawn(args[0], args.splice(1));
 
     var output = [];
